@@ -55,7 +55,7 @@ fun LogIn(navController: NavController) {
         auth.signInWithEmailAndPassword(correoInput, contraInput)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    navController.navigate("chatbot")
+                    navController.navigate("mainpage")
                 } else {
                     coroutineScope.launch {
                         snackbarHostState.showSnackbar("No se reconoce este correo y contraseña")
@@ -109,7 +109,7 @@ fun LogIn(navController: NavController) {
         }
 
         Button(
-            onClick = {  navController.navigate("chatbot") },
+            onClick = {  navController.navigate("mainpage") },
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFF54DBEE)
             ),

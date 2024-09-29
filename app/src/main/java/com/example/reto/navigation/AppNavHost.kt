@@ -3,8 +3,6 @@ package com.example.reto.navigation
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -12,11 +10,18 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.reto.allChatBot.ChatScreen
 import com.example.reto.LogIn
 import com.example.reto.SignUp
-import kotlinx.coroutines.launch
+import com.example.reto.mainPage.MainPageContent
+import com.example.reto.procesosLegales.ProcesosLegalesScreen
+import com.example.reto.procesosLegales.DetailScreen
+import com.example.reto.infoygestion.GestionClientesScreen
+import com.example.reto.infoygestion.InfoAbogadosScreen
+import com.example.reto.forocomponentes.ForumScreen
 
+import kotlinx.coroutines.launch
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,60 +30,160 @@ fun AppNavHost(modifier: Modifier) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    // Navegación siempre comenzando en la pantalla de Login
-    NavHost(
-        navController = navController,
-        startDestination = "login"  // Siempre empieza en Login
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet {
+                DrawerContent(navController = navController, drawerState = drawerState)
+            }
+        }
     ) {
-        // Pantalla Login
-        composable("login") {
-            LogIn(navController)
-        }
-        // Pantalla SignUp
-        composable("signup") {
-            SignUp(navController)
-        }
-        // Pantalla ChatBot
-        composable("chatbot") {
-            Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                ChatScreen(modifier = Modifier.padding(innerPadding), navController)
+        NavHost(
+            navController = navController,
+            startDestination = "login",
+            modifier = Modifier.fillMaxSize()
+        ) {
+            // Pantalla Login (sin TopBar)
+            composable("login") {
+                LogIn(navController)
+            }
+            // Pantalla SignUp (sin TopBar)
+            composable("signup") {
+                SignUp(navController)
+            }
+            // Pantallas con TopBar
+            composable("mainpage") {
+                Scaffold(
+                    topBar = {
+                        TopBar(
+                            onOpenDrawer = {
+                                scope.launch {
+                                    drawerState.apply {
+                                        if (isClosed) open() else close()
+                                    }
+                                }
+                            },
+                            navController
+                        )
+                    }
+                ) { innerPadding ->
+                    MainPageContent(navController, modifier = Modifier.padding(innerPadding))
+                }
+            }
+            // Pantalla ChatBot (con TopBar)
+            composable("chatbot") {
+                Scaffold(
+                    topBar = {
+                        TopBar(
+                            onOpenDrawer = {
+                                scope.launch {
+                                    drawerState.apply {
+                                        if (isClosed) open() else close()
+                                    }
+                                }
+                            },
+                            navController
+                        )
+                    },
+                    modifier = Modifier.fillMaxSize()
+                ) { paddingValues ->
+                    ChatScreen(modifier = Modifier.padding(paddingValues), navController)
+                }
+            }
+            composable("ProcesosLegalesScreen") {
+                Scaffold(
+                    topBar = {
+                        TopBar(
+                            onOpenDrawer = {
+                                scope.launch {
+                                    drawerState.apply {
+                                        if (isClosed) open() else close()
+                                    }
+                                }
+                            },
+                            navController
+                        )
+                    }
+                ) {
+                    ProcesosLegalesScreen(navController)
+                }
+            }
+            composable(
+                "detail/{itemTitle}",
+                arguments = listOf(navArgument("itemTitle") { defaultValue = "" })
+            ) { backStackEntry ->
+                val itemTitle = backStackEntry.arguments?.getString("itemTitle") ?: ""
+                Scaffold(
+                    topBar = {
+                        TopBar(
+                            onOpenDrawer = {
+                                scope.launch {
+                                    drawerState.apply {
+                                        if (isClosed) open() else close()
+                                    }
+                                }
+                            },
+                            navController
+                        )
+                    }
+                ) {
+                    DetailScreen(itemTitle = itemTitle, onBackClick = { navController.popBackStack() })
+                }
+            }
+            composable("gestionClientes") {
+                Scaffold(
+                    topBar = {
+                        TopBar(
+                            onOpenDrawer = {
+                                scope.launch {
+                                    drawerState.apply {
+                                        if (isClosed) open() else close()
+                                    }
+                                }
+                            },
+                            navController
+                        )
+                    }
+                ) {
+                    GestionClientesScreen(navController)
+                }
+            }
+            composable("infoAbogados") {
+                Scaffold(
+                    topBar = {
+                        TopBar(
+                            onOpenDrawer = {
+                                scope.launch {
+                                    drawerState.apply {
+                                        if (isClosed) open() else close()
+                                    }
+                                }
+                            },
+                            navController
+                        )
+                    }
+                ) {
+                    InfoAbogadosScreen(navController)
+                }
+            }
+            composable("foro") {
+                Scaffold(
+                    topBar = {
+                        TopBar(
+                            onOpenDrawer = {
+                                scope.launch {
+                                    drawerState.apply {
+                                        if (isClosed) open() else close()
+                                    }
+                                }
+                            },
+                            navController
+                        )
+                    }
+                ) {
+                    ForumScreen(navController)
+                }
             }
         }
     }
 }
-
-//esto es para hacer  un scaffold
-/*
-            ModalNavigationDrawer(
-                drawerState = drawerState,
-                drawerContent = {
-                    ModalDrawerSheet {
-                        // Aquí puedes agregar un drawer si es necesario
-                        Text(text = "Menú lateral")
-                    }
-                }
-            ) {
-                Scaffold(
-                    topBar = {
-                        TopAppBar(
-                            title = { Text("ChatBot") },
-                            navigationIcon = {
-                                IconButton(onClick = {
-                                    scope.launch { drawerState.open() }
-                                }) {
-                                    Icon(Icons.Default.Menu, contentDescription = "Menu")
-                                }
-                            }
-                        )
-                    },
-                    content = {
-                        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                            ChatScreen(modifier = Modifier.padding(innerPadding), navController)
-                        }
-                    }
-                )
-            }
-
-
-
- */

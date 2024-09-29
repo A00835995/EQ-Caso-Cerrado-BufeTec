@@ -15,7 +15,13 @@ import com.example.reto.ui.theme.RetoTheme
 import com.example.reto.allChatBot.ChatScreen
 import com.example.reto.navigation.AppNavHost
 import com.google.firebase.auth.FirebaseAuth
-//Emilio Cavazos A00835995
+/*
+Fernando Daniel Rentería Saldaña 	A00836509
+Mauricio Perea González 			A01571406
+Emilio Vidal Cavazos Páez 			A00835995
+Bernardo José Willis Lozano			A00837831
+Vanessa Karina Juárez Garza         A00834795
+ */
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
