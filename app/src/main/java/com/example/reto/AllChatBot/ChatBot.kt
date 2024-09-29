@@ -1,6 +1,7 @@
-package com.example.reto
+package com.example.reto.allChatBot
 
 import android.util.Log
+import com.example.reto.BuildConfig
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody

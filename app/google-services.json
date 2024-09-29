@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "284204469643",
+    "project_id": "caso-cerrado-db273",
+    "storage_bucket": "caso-cerrado-db273.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:284204469643:android:be1b0881d3e4af6466738e",
+        "android_client_info": {
+          "package_name": "com.example.reto"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDTtuRbe-3HyvN94KgDJW9ysY_kzVGFVGA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,4 +1,4 @@
-package com.example.reto.ui
+package com.example.reto.allChatBot
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -10,7 +10,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
-import com.example.reto.Message
 
 @Composable
 fun ChatB(message: Message) {

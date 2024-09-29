@@ -3,6 +3,7 @@ package com.example.reto
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -32,21 +33,63 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true)
 @Composable
-fun SignIn() {
+fun SignUp(navController: NavController) {
+    val auth = FirebaseAuth.getInstance()
+
     var correoInput by remember { mutableStateOf("") }
     var contraInput by remember { mutableStateOf("") }
     var contra2Input by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) } // Estado para controlar el desplegable
     val options = listOf("Colaborador", "Practicante", "Cliente")
     var selectedOption by remember { mutableStateOf("") } // Variable para mostrar la opción seleccionada
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+
 
     val textFieldBackgroundColor = Color(0xFFE0F7FA) // Color de fondo para el TextField
     val textFieldBorderColor = Color(0xFF54DBEE) // Color del borde
+
+    fun crearCuenta() {
+        if (contraInput == contra2Input) {
+            if (contraInput.length < 6){
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar("La contraseña debe de ser de minimo 6 caracteres")
+                }
+            }
+            if (!correoInput.endsWith("@gmail.com")){
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar("El correo debe de ingresarse correctamente")
+                }
+            }
+            auth.createUserWithEmailAndPassword(correoInput, contraInput)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        // Cuenta creada exitosamente, redirigir o mostrar mensaje
+                        navController.navigate("login")
+                    } else {
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar("Error al crear la cuenta")
+                        }
+                    }
+                }
+        } else {
+            coroutineScope.launch {
+                snackbarHostState.showSnackbar("Las contraseñas no coinciden")
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -54,7 +97,7 @@ fun SignIn() {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(text = "Sign In")
+        Text(text = "Sign Up")
 
         OutlinedTextField(
             value = correoInput,
@@ -139,7 +182,7 @@ fun SignIn() {
         )
 
         Button(
-            onClick = { /*TODO*/ },
+            onClick = {  crearCuenta() },
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFF54DBEE)
             ),
@@ -160,9 +203,28 @@ fun SignIn() {
         }
         ClickableText(
             text = annotatedText,
-            onClick = { /* Agregar lógica de navegación aquí */ },
+            onClick = { navController.navigate("login") },
             modifier = Modifier.fillMaxWidth(),
             style = MaterialTheme.typography.bodyLarge
         )
+
+        SnackbarHost(hostState = snackbarHostState,
+            modifier = Modifier
+                .fillMaxWidth()
+        ) { data ->
+            Box(
+                modifier = Modifier.fillMaxWidth() // Asegura que el Box ocupe todo el ancho
+            ) {
+                Snackbar(
+                    snackbarData = data,
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .align(Alignment.Center),
+                    containerColor = Color(0xFF06BDE0), // Color del fondo del Snackbar
+                    contentColor = Color.Black // Color del texto del mensaje
+                )
+            }
+        }
+
     }
 }

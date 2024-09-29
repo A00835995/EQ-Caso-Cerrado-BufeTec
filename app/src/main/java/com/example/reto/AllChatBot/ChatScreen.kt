@@ -1,4 +1,4 @@
-package com.example.reto.ui
+package com.example.reto.allChatBot
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -9,13 +9,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
-import com.example.reto.Message
-import com.example.reto.getResponse
+import androidx.navigation.NavController
+import com.example.reto.allChatBot.ChatB
+import com.example.reto.allChatBot.getResponse
 
 @Composable
-fun ChatScreen(modifier: Modifier = Modifier) {
+fun ChatScreen(modifier: Modifier = Modifier,navController: NavController) {
     var userInput by remember { mutableStateOf("") }
     val messageList = remember { mutableStateListOf<Message>() }
     var isLoading by remember { mutableStateOf(false) } // Estado de carga
@@ -26,6 +26,8 @@ fun ChatScreen(modifier: Modifier = Modifier) {
             .background(Color.White)
     ) {
         // Box que actúa como header
+        Button(onClick = { navController.navigate("login")}) {
+        }
         Box(
             modifier = Modifier
                 .fillMaxWidth()  // Ocupa todo el ancho
