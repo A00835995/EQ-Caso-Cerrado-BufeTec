@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.reto.allChatBot.ChatB
@@ -25,9 +26,6 @@ fun ChatScreen(modifier: Modifier = Modifier,navController: NavController) {
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // Box que actúa como header
-        Button(onClick = { navController.navigate("login")}) {
-        }
         Box(
             modifier = Modifier
                 .fillMaxWidth()  // Ocupa todo el ancho
@@ -54,7 +52,8 @@ fun ChatScreen(modifier: Modifier = Modifier,navController: NavController) {
                         CircularProgressIndicator(
                             modifier = Modifier
                                 .padding(8.dp)
-                                .align(Alignment.Start) // Alinear al inicio
+                                .align(Alignment.Start)
+                                .testTag("LoadingIndicator")
                         )
                     }
                 }
@@ -68,6 +67,7 @@ fun ChatScreen(modifier: Modifier = Modifier,navController: NavController) {
                 label = { Text("Mensaje al Asistente Inteligente") },
                 // Configura colores...
                 modifier = Modifier.fillMaxWidth()
+                    .testTag("UserInputField")
             )
 
             Button(
@@ -83,6 +83,7 @@ fun ChatScreen(modifier: Modifier = Modifier,navController: NavController) {
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
+                    .testTag("SendButton")
             ) {
                 Text(text = "Send")
             }
