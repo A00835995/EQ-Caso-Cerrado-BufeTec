@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Define tu tema personalizado aquí -->
+    <style name="Theme.Reto" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <!-- Personaliza los colores principales aquí -->
+        <item name="colorPrimary">@color/blue_primary</item>
+        <item name="colorPrimaryVariant">@color/blue_dark</item>
+        <item name="colorOnPrimary">@color/text_white</item>
+        <item name="colorSecondary">@color/blue_light</item>
+    </style>
+</resources>

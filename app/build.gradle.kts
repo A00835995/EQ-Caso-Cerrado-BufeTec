@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -50,7 +51,19 @@ android {
 }
 
 dependencies {
+    implementation("com.google.firebase:firebase-database:20.2.2")
+    implementation("com.google.firebase:firebase-analytics")
+    implementation(platform("com.google.firebase:firebase-bom:32.7.4"))
 
+    implementation("com.google.accompanist:accompanist-pager:0.26.2-beta")
+    implementation("com.google.accompanist:accompanist-pager-indicators:0.26.2-beta")
+
+    implementation("androidx.navigation:navigation-compose:2.4.0-alpha10")
+
+
+    implementation("com.google.android.material:material:1.9.0")
+    implementation("androidx.compose.ui:ui:1.5.0")
+    implementation("androidx.compose.material:material:1.5.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
