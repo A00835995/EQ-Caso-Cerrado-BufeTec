@@ -1,5 +1,6 @@
 package com.example.reto.mainPage
 
+import UserViewModel
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -14,6 +15,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.reto.R
 import com.google.accompanist.pager.*
@@ -21,7 +23,17 @@ import kotlinx.coroutines.delay
 
 // Página principal
 @Composable
-fun MainPageContent(navController: NavController, modifier: Modifier = Modifier) {
+fun MainPageContent(navController: NavController,
+                    userViewModel: UserViewModel = viewModel(),
+                    modifier: Modifier = Modifier) {
+
+    // Llamar a fetchUserData() solo una vez cuando el Composable se carga
+    LaunchedEffect(Unit) {
+        userViewModel.fetchUserData()
+    }
+
+    // Obtenemos el rol del usuario desde el ViewModel
+    val userRelation = userViewModel.userRelation.collectAsState().value
 
     //Imágenes del slider
     val images = listOf(
@@ -101,13 +113,16 @@ fun MainPageContent(navController: NavController, modifier: Modifier = Modifier)
                 }
             )
 
-            CircularNavigationButton(
-                imageRes = R.drawable.client,
-                text = " Catálogo\nde clientes",
-                onClick = {
-                    navController.navigate("gestionClientes")
-                }
-            )
+            // Mostrar el botón "Catálogo de clientes" solo si el usuario es Practicante o Colaborador
+            if (userRelation == "Practicante" || userRelation == "Colaborador") {
+                CircularNavigationButton(
+                    imageRes = R.drawable.client,
+                    text = " Catálogo\nde clientes",
+                    onClick = {
+                        navController.navigate("gestionClientes")
+                    }
+                )
+            }
 
             CircularNavigationButton(
                 imageRes = R.drawable.legal,
@@ -138,14 +153,16 @@ fun MainPageContent(navController: NavController, modifier: Modifier = Modifier)
                     navController.navigate("chatbot")
                 }
             )
-
-            CircularNavigationButton(
-                imageRes = R.drawable.me,
-                text = "Ver mi caso",
-                onClick = {
-                    navController.navigate("chatbot")
-                }
-            )
+            if(userRelation=="Colaborador")
+            {
+                CircularNavigationButton(
+                    imageRes = R.drawable.me,
+                    text = "Administrar",
+                    onClick = {
+                        navController.navigate("adminUsuarios")
+                    }
+                )
+            }
         }
     }
 }
@@ -182,8 +199,10 @@ fun IndicatorDots(isSelected: Boolean, modifier: Modifier) {
 fun CircularNavigationButton(imageRes: Int, text: String, onClick: () -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center, // Asegura que el contenido esté centrado verticalmente
         modifier = Modifier
             .padding(8.dp)
+            .wrapContentSize(Alignment.Center) // Centrar el contenido
     ) {
         IconButton(
             onClick = onClick,
@@ -195,7 +214,9 @@ fun CircularNavigationButton(imageRes: Int, text: String, onClick: () -> Unit) {
             Image(
                 painter = painterResource(id = imageRes),
                 contentDescription = null,
-                modifier = Modifier.fillMaxHeight()
+                modifier = Modifier
+                    .fillMaxSize() // Asegura que la imagen llene el espacio disponible
+                    .padding(8.dp) // Añadir algo de padding si la imagen no se ajusta bien
             )
         }
 
@@ -205,8 +226,8 @@ fun CircularNavigationButton(imageRes: Int, text: String, onClick: () -> Unit) {
             color = Color.Black,
             modifier = Modifier
                 .padding(top = 8.dp)
-                .widthIn(max = 100.dp)
+                .widthIn(max = 100.dp) // Controla el ancho del texto para evitar desbordes
+                .align(Alignment.CenterHorizontally) // Mantiene el texto centrado horizontalmente
         )
     }
 }
-

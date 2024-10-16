@@ -1,5 +1,6 @@
 package com.example.reto.forocomponentes
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -8,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,6 +21,8 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.navigation.NavHostController
+import com.example.reto.ui.theme.DarkestBlue
+import com.example.reto.ui.theme.IceBlue
 
 @Composable
 fun ForumScreen(navHostController: NavHostController) {

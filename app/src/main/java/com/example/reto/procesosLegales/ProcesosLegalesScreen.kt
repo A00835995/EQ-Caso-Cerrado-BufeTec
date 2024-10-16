@@ -1,22 +1,17 @@
 package com.example.reto.procesosLegales
 
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
@@ -34,13 +29,11 @@ fun ProcesosLegalesScreen(navController: NavHostController, viewModel: ProcesosV
 
     var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
 
-    // Lista actualizada de procesos legales con diferentes nombres y explicaciones
+    // Lista original de procesos legales
     val originalCardItems = listOf(
-        CardItem("Penales", "Proceso legal en donde se juzgan crímenes graves como homicidios o robos.", false),
-        CardItem("Civiles", "Litigios entre personas o entidades privadas para resolver disputas civiles.", false),
-        CardItem("Laborales", "Resolución de conflictos entre trabajadores y empleadores.", false),
-        CardItem("Familiares", "Asuntos relacionados con el matrimonio, divorcio y custodia de hijos.", false),
-        CardItem("Administrativos", "Resolución de disputas entre ciudadanos y organismos del gobierno.", false)
+        CardItem("Civil", "Trámites legales relacionados con asuntos civiles.", false),
+        CardItem("Familiar", "Trámites legales relacionados con asuntos familiares.", false),
+        CardItem("Mercantil", "Trámites legales relacionados con asuntos mercantiles.", false)
     )
 
     // Estado mutable que mantiene la lista actual de tarjetas
@@ -73,42 +66,33 @@ fun ProcesosLegalesScreen(navController: NavHostController, viewModel: ProcesosV
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Barra de búsqueda sin borde
+            // Barra de búsqueda
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { newValue -> searchQuery = newValue },
                 label = { Text("Buscar") },
-                leadingIcon = { Icon(imageVector = Icons.Filled.Search, contentDescription = null) }, // Ícono de búsqueda
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp)
-                    .clip(RoundedCornerShape(24.dp)) // Bordes redondeados
-                    .background(Color(0xFFEEF3FC)),  // Color de fondo
-                singleLine = true,
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    backgroundColor = Color(0xFFEEF3FC), // Fondo de color claro
-                    focusedBorderColor = Color.Transparent, // Sin borde al enfocar
-                    unfocusedBorderColor = Color.Transparent // Sin borde al desenfocar
-                ),
+                    .background(Color(0xFFE8F0FE)),  // Aplica el color de fondo de la barra de búsqueda
+                singleLine = true, // Mantiene el TextField en una sola línea
+                colors = TextFieldDefaults.outlinedTextFieldColors(), // Para Material2
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Asegurar que LazyColumn permita scroll
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize() // Asegurarse de que ocupetodo el espacio disponible
-                    .padding(horizontal = 16.dp)
-            ) {
-                items(filteredItems) { item ->
+            // Mostrar las tarjetas filtradas con la funcionalidad de favoritos
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
+                items(filteredItems.size) { index ->
                     CardItemView(
-                        cardItem = item,
+                        cardItem = filteredItems[index],
                         onClick = {
                             // Navegar a la pantalla de detalles pasando el título
-                            navController.navigate("detail/${item.title}")
+                            navController.navigate("detail/${filteredItems[index].title}")
                         },
                         onFavoriteClick = {
+                            val item = filteredItems[index]
                             if (item.isFavorite) {
                                 coroutineScope.launch { viewModel.removeFavorite(item.title) }
                             } else {
@@ -137,10 +121,9 @@ fun CardItemView(cardItem: CardItem, onClick: () -> Unit, onFavoriteClick: () ->
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp)) // Bordes redondeados para las tarjetas
             .clickable { onClick() },
-        elevation = 4.dp,
-        backgroundColor = Color(0xFFD9E3F0) // Color de fondo similar al de la imagen
+        backgroundColor = Color(0xFFBCC9E5),
+        elevation = 4.dp
     ) {
         Row(
             modifier = Modifier.padding(16.dp),

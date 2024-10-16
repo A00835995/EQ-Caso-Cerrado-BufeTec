@@ -1,5 +1,6 @@
 package com.example.reto.forocomponentes
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -8,10 +9,13 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.reto.ui.theme.DarkestBlue
 
 @Composable
 fun QuestionCard(
@@ -31,11 +35,12 @@ fun QuestionCard(
             .clickable(onClick = onClick)
             .padding(8.dp)
             .fillMaxWidth(),
+        backgroundColor = Color(0xFFBCC9E5),
         elevation = 4.dp
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = title, style = MaterialTheme.typography.h6)
-            Text(text = "por $author", style = MaterialTheme.typography.body2)
+            Text(text = title, style = MaterialTheme.typography.h6, color = Color(0xFF03256C),fontWeight = FontWeight.Bold)
+            Text(text = "por $author", style = MaterialTheme.typography.body2,fontWeight = FontWeight.Medium,)
             Text(text = description, style = MaterialTheme.typography.body1)
 
             Spacer(modifier = Modifier.height(8.dp))

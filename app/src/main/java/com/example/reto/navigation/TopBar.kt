@@ -59,6 +59,10 @@ fun TopBar(onOpenDrawer: () -> Unit, navController: NavController) {
                 modifier = Modifier
                     .padding(start = 8.dp, end = 16.dp)
                     .size(28.dp)
+                    .clickable{
+                        navController.navigate("perfil")
+                    }
+
             )
         }
     )

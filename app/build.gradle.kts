@@ -102,6 +102,11 @@ dependencies {
     debugImplementation (libs.androidx.ui.test.manifest.v105)
     androidTestImplementation (libs.androidx.junit.v113)
     androidTestImplementation (libs.androidx.espresso.core.v340)
+    implementation (libs.google.firebase.auth)
+    implementation (libs.firebase.database.v2005)
+    implementation (libs.androidx.foundation)
+    implementation (libs.androidx.constraintlayout.compose)
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

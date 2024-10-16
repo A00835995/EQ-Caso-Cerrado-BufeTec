@@ -1,11 +1,15 @@
 package com.example.reto
 
+import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Button
@@ -38,17 +42,25 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUp(navController: NavController) {
     val auth = FirebaseAuth.getInstance()
+    val database = FirebaseDatabase.getInstance()
+    val usersRef = database.getReference("users")
 
     var correoInput by remember { mutableStateOf("") }
+    var nombreInput by remember { mutableStateOf("") }
     var contraInput by remember { mutableStateOf("") }
     var contra2Input by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) } // Estado para controlar el desplegable
@@ -58,32 +70,57 @@ fun SignUp(navController: NavController) {
     val coroutineScope = rememberCoroutineScope()
 
 
-    val textFieldBackgroundColor = Color(0xFFE0F7FA) // Color de fondo para el TextField
-    val textFieldBorderColor = Color(0xFF54DBEE) // Color del borde
+    val textFieldBackgroundColor = Color(0xFFBCC9E5) // Color de fondo para el TextField
+    val textFieldBorderColor = Color(0xFF1768AC) // Color del borde
 
     fun crearCuenta() {
         if (contraInput == contra2Input) {
-            if (contraInput.length < 6){
+            if (contraInput.length < 6) {
                 coroutineScope.launch {
-                    snackbarHostState.showSnackbar("La contraseña debe de ser de minimo 6 caracteres")
+                    snackbarHostState.showSnackbar("La contraseña debe de ser de mínimo 6 caracteres")
                 }
-            }
-            if (!correoInput.endsWith("@gmail.com")){
+            } else if (!correoInput.endsWith("@gmail.com")) {
                 coroutineScope.launch {
-                    snackbarHostState.showSnackbar("El correo debe de ingresarse correctamente")
+                    snackbarHostState.showSnackbar("El correo debe ingresarse correctamente")
                 }
-            }
-            auth.createUserWithEmailAndPassword(correoInput, contraInput)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        // Cuenta creada exitosamente, redirigir o mostrar mensaje
-                        navController.navigate("login")
-                    } else {
-                        coroutineScope.launch {
-                            snackbarHostState.showSnackbar("Error al crear la cuenta")
+            } else {
+                auth.createUserWithEmailAndPassword(correoInput, contraInput)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            // Obtener el ID del usuario justo después de que se haya creado la cuenta
+                            val userId = auth.currentUser?.uid
+                            // Crear un objeto con los datos del usuario
+
+                            val estado = if (selectedOption == "Cliente") "Activo" else "Inactivo"
+
+                            val user = User(
+                                userId = userId,
+                                nombre = nombreInput,
+                                correo = correoInput,
+                                relacion = selectedOption,
+                                estado = estado
+                            )
+
+                            // Guardar la información del usuario en Firebase Realtime Database
+                            userId?.let {
+                                usersRef.child(it).setValue(user)
+                                    .addOnSuccessListener {
+                                        // Redirigir al login si la información se guardó exitosamente
+                                        navController.navigate("login")
+                                    }
+                                    .addOnFailureListener {
+                                        coroutineScope.launch {
+                                            snackbarHostState.showSnackbar("Error al guardar la información del usuario")
+                                        }
+                                    }
+                            }
+                        } else {
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar("Error al crear la cuenta")
+                            }
                         }
                     }
-                }
+            }
         } else {
             coroutineScope.launch {
                 snackbarHostState.showSnackbar("Las contraseñas no coinciden")
@@ -97,7 +134,26 @@ fun SignUp(navController: NavController) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(text = "Sign Up")
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Image(
+            painter = painterResource(id = R.drawable.buffeeee),
+            contentDescription = "Logo",
+            modifier = Modifier
+                .background(Color(0xFF2541B2))
+                .fillMaxWidth()
+                .padding(10.dp)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Texto de Sign Up con mayor tamaño
+        Text(
+            text = "Sign Up",
+            fontSize = 32.sp,
+            fontWeight = FontWeight.ExtraBold,
+            color = Color(0xFF2541B2),
+        )
 
         OutlinedTextField(
             value = correoInput,
@@ -114,9 +170,24 @@ fun SignUp(navController: NavController) {
         )
 
         OutlinedTextField(
+            value = nombreInput,
+            onValueChange = { nombreInput = it },
+            label = { Text("Nombre Completo") },
+            modifier = Modifier.fillMaxWidth(),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = textFieldBackgroundColor,
+                unfocusedContainerColor = textFieldBackgroundColor,
+                focusedIndicatorColor = textFieldBorderColor,
+                unfocusedIndicatorColor = textFieldBorderColor
+            ),
+            shape = RoundedCornerShape(16.dp)
+        )
+
+        OutlinedTextField(
             value = contraInput,
             onValueChange = { contraInput = it },
             label = { Text("Contraseña") },
+            visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth(),
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = textFieldBackgroundColor,
@@ -171,6 +242,7 @@ fun SignUp(navController: NavController) {
             value = contra2Input,
             onValueChange = { contra2Input = it },
             label = { Text("Verificar Contraseña") },
+            visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth(),
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = textFieldBackgroundColor,
@@ -184,7 +256,7 @@ fun SignUp(navController: NavController) {
         Button(
             onClick = {  crearCuenta() },
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF54DBEE)
+                containerColor = Color(0xFF2541B2)
             ),
             modifier = Modifier
                 .fillMaxWidth()
@@ -195,7 +267,7 @@ fun SignUp(navController: NavController) {
         // Clickable text link
         val annotatedText = buildAnnotatedString {
             append("Ya tienes una cuenta? ")
-            withStyle(style = SpanStyle(color = Color(0xFF5FD4E8))) {
+            withStyle(style = SpanStyle(color = Color(0xFF03256C))) {
                 pushStringAnnotation(tag = "URL", annotation = "https://www.google.com")
                 append("Login")
                 pop()

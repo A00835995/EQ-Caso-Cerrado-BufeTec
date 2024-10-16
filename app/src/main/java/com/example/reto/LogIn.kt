@@ -1,13 +1,18 @@
 package com.example.reto
 
 import android.annotation.SuppressLint
+import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -33,11 +38,19 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.reto.ui.theme.TecBlue
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.launch
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,16 +60,42 @@ fun LogIn(navController: NavController) {
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
     val auth = FirebaseAuth.getInstance()
+    val database = FirebaseDatabase.getInstance()
+    val usersRef = database.getReference("users")
 
-    val textFieldBackgroundColor = Color(0xFFE0F7FA) // Color de fondo para el TextField
-    val textFieldBorderColor = Color(0xFF54DBEE) // Color del borde
+    val textFieldBackgroundColor = Color(0xFFBCC9E5) // Color de fondo para el TextField
+    val textFieldBorderColor = Color(0xFF1768AC) // Color del borde
 
 
     fun iniciarSesion() {
         auth.signInWithEmailAndPassword(correoInput, contraInput)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    navController.navigate("mainpage")
+                    // Obtener el usuario autenticado
+                    val user = auth.currentUser
+                    val userId = user?.uid
+                    Log.d("FirebaseDatabase", "ID del usuario autenticado: $userId")
+                    // Recuperar la información del usuario desde Firebase Realtime Database
+                    userId?.let {
+                        usersRef.child(it).get().addOnSuccessListener { dataSnapshot ->
+                            val userInfo = dataSnapshot.getValue(User::class.java)
+                            Log.d("FirebaseDatabase", "Datos del usuario autenticado: $userInfo")
+
+                            if (userInfo?.estado == "Inactivo") {
+                                coroutineScope.launch {
+                                    snackbarHostState.showSnackbar("Tu cuenta está inactiva. Contacta a un administrador.")
+                                }
+                            } else {
+                                // Redirigir a la pantalla principal si el usuario está activo
+                                navController.navigate("mainpage")
+                            }
+                        }.addOnFailureListener { exception ->
+                            Log.e("FirebaseDatabase", "Error al obtener los datos del usuario", exception)
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar("Error al obtener la información del usuario")
+                            }
+                        }
+                    }
                 } else {
                     coroutineScope.launch {
                         snackbarHostState.showSnackbar("No se reconoce este correo y contraseña")
@@ -71,7 +110,26 @@ fun LogIn(navController: NavController) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(text = "Login")
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Image(
+            painter = painterResource(id = R.drawable.buffeeee),
+            contentDescription = "Logo",
+            modifier = Modifier
+                .background(Color(0xFF2541B2))
+                .fillMaxWidth()
+                .padding(10.dp)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Texto de login con mayor tamaño
+        Text(
+            text = "Login",
+            fontSize = 32.sp,
+            fontWeight = FontWeight.ExtraBold,
+            color = Color(0xFF2541B2),
+        )
         OutlinedTextField(
             value = correoInput,
             onValueChange = { correoInput = it },
@@ -89,6 +147,7 @@ fun LogIn(navController: NavController) {
             value = contraInput,
             onValueChange = { contraInput = it },
             label = { Text("Contraseña") },
+            visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth(),
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = textFieldBackgroundColor,
@@ -102,7 +161,7 @@ fun LogIn(navController: NavController) {
         Button(
             onClick = { iniciarSesion()  },
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF06BDE0)
+                containerColor = Color(0xFF2541B2)
             ),
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -110,9 +169,25 @@ fun LogIn(navController: NavController) {
         }
 
         Button(
-            onClick = {  navController.navigate("mainpage") },
+            onClick = {
+                auth.signOut()//sale del usuairo anterior
+                // usuario creado como invitado
+                val guestUserId = "t1Uobs8YaaOvFY47cvXJBETrPPH3"
+                usersRef.child(guestUserId).get().addOnSuccessListener { dataSnapshot ->
+                    val guestUserInfo = dataSnapshot.getValue(User::class.java)
+                    Log.d("FirebaseDatabase", "Datos del usuario invitado: $guestUserInfo")
+
+                    // Aquí puedes manejar los datos del usuario invitado como necesites
+                    navController.navigate("mainpage")
+                }.addOnFailureListener { exception ->
+                    Log.e("FirebaseDatabase", "Error al obtener los datos del usuario invitado", exception)
+                    coroutineScope.launch {
+                        snackbarHostState.showSnackbar("Error al obtener la información del usuario invitado")
+                    }
+                }
+            },
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF54DBEE)
+                containerColor = Color(0xE92541B2)
             ),
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -122,7 +197,7 @@ fun LogIn(navController: NavController) {
         // Texto clicable para registrar una nueva cuenta
         val annotatedText = buildAnnotatedString {
             append("¿No tienes cuenta? ")
-            withStyle(style = SpanStyle(color = Color(0xFF06BDE0))) {
+            withStyle(style = SpanStyle(color = Color(0xFF03256C))) {
                 pushStringAnnotation(tag = "URL", annotation = "https://www.google.com")
                 append("Sign Up")
                 pop()

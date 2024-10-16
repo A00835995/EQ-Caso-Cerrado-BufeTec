@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.reto.allChatBot.ChatB
 import com.example.reto.allChatBot.getResponse
+import com.example.reto.ui.theme.TecBlue
 
 @Composable
 fun ChatScreen(modifier: Modifier = Modifier,navController: NavController) {
@@ -82,6 +83,7 @@ fun ChatScreen(modifier: Modifier = Modifier,navController: NavController) {
                         userInput = ""
                     }
                 },
+                colors = ButtonDefaults.buttonColors(containerColor = TecBlue),
                 modifier = Modifier.fillMaxWidth()
                     .testTag("SendButton")
             ) {

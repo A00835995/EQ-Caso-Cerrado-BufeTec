@@ -5,12 +5,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.reto.AdministrarUsuarios
 import com.example.reto.allChatBot.ChatScreen
 import com.example.reto.LogIn
 import com.example.reto.SignUp
@@ -20,6 +23,7 @@ import com.example.reto.procesosLegales.DetailScreen
 import com.example.reto.infoygestion.GestionClientesScreen
 import com.example.reto.infoygestion.InfoAbogadosScreen
 import com.example.reto.forocomponentes.ForumScreen
+import com.example.reto.mainPage.PerfilScreen
 
 import kotlinx.coroutines.launch
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -30,8 +34,15 @@ fun AppNavHost(modifier: Modifier) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = currentBackStackEntry?.destination?.route
+
+    // Condicionamos el uso del gesto para abrir el Drawer y que no funcione cuando esta en el sign up ni log in
+    val gesturesEnabled = currentRoute != "login" && currentRoute != "signup"
+
     ModalNavigationDrawer(
         drawerState = drawerState,
+        gesturesEnabled = gesturesEnabled,
         drawerContent = {
             ModalDrawerSheet {
                 DrawerContent(navController = navController, drawerState = drawerState)
@@ -43,11 +54,11 @@ fun AppNavHost(modifier: Modifier) {
             startDestination = "login",
             modifier = Modifier.fillMaxSize()
         ) {
-            // Pantalla Login (sin TopBar)
+            // Pantalla Login sin Drawer
             composable("login") {
                 LogIn(navController)
             }
-            // Pantalla SignUp (sin TopBar)
+            // Pantalla SignUp sin Drawer
             composable("signup") {
                 SignUp(navController)
             }
@@ -182,6 +193,42 @@ fun AppNavHost(modifier: Modifier) {
                     }
                 ) {
                     ForumScreen(navController)
+                }
+            }
+            composable("adminUsuarios") {
+                Scaffold(
+                    topBar = {
+                        TopBar(
+                            onOpenDrawer = {
+                                scope.launch {
+                                    drawerState.apply {
+                                        if (isClosed) open() else close()
+                                    }
+                                }
+                            },
+                            navController
+                        )
+                    }
+                ) {
+                    AdministrarUsuarios(navController)
+                }
+            }
+            composable("perfil") {
+                Scaffold(
+                    topBar = {
+                        TopBar(
+                            onOpenDrawer = {
+                                scope.launch {
+                                    drawerState.apply {
+                                        if (isClosed) open() else close()
+                                    }
+                                }
+                            },
+                            navController
+                        )
+                    }
+                ) {
+                    PerfilScreen(navController)
                 }
             }
         }
