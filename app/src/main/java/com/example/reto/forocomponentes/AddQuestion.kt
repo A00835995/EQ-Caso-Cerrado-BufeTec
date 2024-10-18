@@ -15,6 +15,7 @@ fun AddQuestionDialog(
     var title by remember { mutableStateOf("") }
     var author by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
+    var showError by remember { mutableStateOf(false) }  // Variable para mostrar error
 
     AlertDialog(
         onDismissRequest = { onDismiss() },
@@ -24,15 +25,18 @@ fun AddQuestionDialog(
                 // Campo de texto para el título
                 OutlinedTextField(
                     value = title,
-                    onValueChange = { title = it },
+                    onValueChange = {
+                        title = it
+                        showError = false
+                    },
                     label = { Text("Título") },
                     modifier = Modifier.fillMaxWidth(),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
-                        cursorColor = Color(0xFF1E88E5), // Color del cursor
-                        focusedBorderColor = Color(0xFF1E88E5), // Color del borde cuando está enfocado
-                        unfocusedBorderColor = Color.Gray, // Color del borde cuando no está enfocado
-                        focusedLabelColor = Color(0xFF1E88E5), // Color del label cuando está enfocado
-                        unfocusedLabelColor = Color.Gray // Color del label cuando no está enfocado
+                        cursorColor = Color(0xFF1E88E5),
+                        focusedBorderColor = Color(0xFF1E88E5),
+                        unfocusedBorderColor = Color.Gray,
+                        focusedLabelColor = Color(0xFF1E88E5),
+                        unfocusedLabelColor = Color.Gray
                     )
                 )
 
@@ -41,7 +45,10 @@ fun AddQuestionDialog(
                 // Campo de texto para el autor
                 OutlinedTextField(
                     value = author,
-                    onValueChange = { author = it },
+                    onValueChange = {
+                        author = it
+                        showError = false
+                    },
                     label = { Text("Autor") },
                     modifier = Modifier.fillMaxWidth(),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -58,7 +65,10 @@ fun AddQuestionDialog(
                 // Campo de texto para la descripción
                 OutlinedTextField(
                     value = description,
-                    onValueChange = { description = it },
+                    onValueChange = {
+                        description = it
+                        showError = false
+                    },
                     label = { Text("Descripción") },
                     modifier = Modifier.fillMaxWidth(),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -69,12 +79,24 @@ fun AddQuestionDialog(
                         unfocusedLabelColor = Color.Gray
                     )
                 )
+
+                if (showError) {
+                    Text(
+                        text = "Por favor, rellena todos los campos.",
+                        color = Color.Red,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                }
             }
         },
         confirmButton = {
             TextButton(
                 onClick = {
-                    onAddQuestion(title, author, description)
+                    if (title.isNotEmpty() && author.isNotEmpty() && description.isNotEmpty()) {
+                        onAddQuestion(title, author, description)
+                    } else {
+                        showError = true
+                    }
                 },
                 colors = ButtonDefaults.textButtonColors(backgroundColor = Color(0xFF1E88E5))
             ) {

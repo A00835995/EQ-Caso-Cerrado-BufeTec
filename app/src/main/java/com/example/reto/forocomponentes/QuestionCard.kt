@@ -72,16 +72,16 @@ fun QuestionCard(
 
                 if (!hasResponse) {
                     // Botón de responder
-                    if (userRelation == "Practicante" || userRelation == "Colaborador") {
+                    if (userRelation == "Colaborador") {
                         TextButton(onClick = onRespondClick) {
-                            Text("Responder", color = Color(0xFF1E88E5)) // Cambia el color a azul
+                            Text("Responder", color = Color(0xFF1E88E5))
                         }
                     }
                 } else {
                     Icon(
                         imageVector = Icons.Default.CheckCircle,
                         contentDescription = "Respondido",
-                        tint = Color.Green // Cambio de color a verde
+                        tint = Color.Green
                     )
                 }
             }
