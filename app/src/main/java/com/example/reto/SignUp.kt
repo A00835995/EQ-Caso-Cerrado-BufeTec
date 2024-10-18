@@ -83,6 +83,10 @@ fun SignUp(navController: NavController) {
                 coroutineScope.launch {
                     snackbarHostState.showSnackbar("El correo debe ingresarse correctamente")
                 }
+            }else if(selectedOption.isEmpty()){
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar("Debe seleccionar una relación con la aplicación")
+                }
             } else {
                 auth.createUserWithEmailAndPassword(correoInput, contraInput)
                     .addOnCompleteListener { task ->
@@ -145,8 +149,23 @@ fun SignUp(navController: NavController) {
                 .padding(10.dp)
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
-
+        SnackbarHost(hostState = snackbarHostState,
+            modifier = Modifier
+                .fillMaxWidth()
+        ) { data ->
+            Box(
+                modifier = Modifier.fillMaxWidth() // Asegura que el Box ocupe todo el ancho
+            ) {
+                Snackbar(
+                    snackbarData = data,
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .align(Alignment.Center),
+                    containerColor = Color(0xFF06BDE0), // Color del fondo del Snackbar
+                    contentColor = Color.Black // Color del texto del mensaje
+                )
+            }
+        }
         // Texto de Sign Up con mayor tamaño
         Text(
             text = "Sign Up",
@@ -279,24 +298,6 @@ fun SignUp(navController: NavController) {
             modifier = Modifier.fillMaxWidth(),
             style = MaterialTheme.typography.bodyLarge
         )
-
-        SnackbarHost(hostState = snackbarHostState,
-            modifier = Modifier
-                .fillMaxWidth()
-        ) { data ->
-            Box(
-                modifier = Modifier.fillMaxWidth() // Asegura que el Box ocupe todo el ancho
-            ) {
-                Snackbar(
-                    snackbarData = data,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .align(Alignment.Center),
-                    containerColor = Color(0xFF06BDE0), // Color del fondo del Snackbar
-                    contentColor = Color.Black // Color del texto del mensaje
-                )
-            }
-        }
 
     }
 }

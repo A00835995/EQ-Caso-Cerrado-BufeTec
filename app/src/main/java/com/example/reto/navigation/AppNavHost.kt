@@ -138,7 +138,7 @@ fun AppNavHost(modifier: Modifier) {
                         )
                     }
                 ) {
-                    DetailScreen(itemTitle = itemTitle, onBackClick = { navController.popBackStack() })
+                    DetailScreen(itemTitle = itemTitle, onBackClick = { navController.popBackStack() }, navController)
                 }
             }
             composable("gestionClientes") {

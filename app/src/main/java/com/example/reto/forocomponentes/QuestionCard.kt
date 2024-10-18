@@ -1,5 +1,6 @@
 package com.example.reto.forocomponentes
 
+import UserViewModel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -11,10 +12,13 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.reto.ui.theme.DarkestBlue
 
 @Composable
@@ -28,8 +32,17 @@ fun QuestionCard(
     onFavoriteToggle: () -> Unit,
     onClick: () -> Unit,
     onRespondClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    userViewModel: UserViewModel = viewModel()
 ) {
+    // Llamar a fetchUserData() solo una vez cuando el Composable se carga
+    LaunchedEffect(Unit) {
+        userViewModel.fetchUserData()
+    }
+
+    // Obtenemos el rol del usuario desde el ViewModel
+    val userRelation = userViewModel.userRelation.collectAsState().value
+
     Card(
         modifier = modifier
             .clickable(onClick = onClick)
@@ -59,8 +72,10 @@ fun QuestionCard(
 
                 if (!hasResponse) {
                     // Botón de responder
-                    TextButton(onClick = onRespondClick) {
-                        Text("Responder", color = Color(0xFF1E88E5)) // Cambia el color a azul
+                    if (userRelation == "Practicante" || userRelation == "Colaborador") {
+                        TextButton(onClick = onRespondClick) {
+                            Text("Responder", color = Color(0xFF1E88E5)) // Cambia el color a azul
+                        }
                     }
                 } else {
                     Icon(

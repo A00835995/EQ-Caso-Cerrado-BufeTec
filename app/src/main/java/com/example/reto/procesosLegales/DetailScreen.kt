@@ -12,11 +12,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.google.firebase.database.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailScreen(itemTitle: String, onBackClick: () -> Unit) {
+fun DetailScreen(itemTitle: String, onBackClick: () -> Unit, navController: NavController) {
     var tramitesList by remember { mutableStateOf(listOf<String>()) }
     val database = FirebaseDatabase.getInstance().reference.child("procesos_legales").child(itemTitle.lowercase()).child("tramites")
 
@@ -94,12 +95,18 @@ fun DetailScreen(itemTitle: String, onBackClick: () -> Unit) {
                     }
                 }
             }
+            item{
+                Button(onClick = {
+                    navController.navigate("infoAbogados")
+                },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                    ) {
+                    Text(text = "Abogados")
+                }
+            }
+
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewDetailScreen() {
-    DetailScreen(itemTitle = "Penales", onBackClick = {})
 }
