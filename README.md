@@ -1,4 +1,4 @@
-#Bufetec Legal Support App
+# Bufetec Legal Support App
 <!-- Add logo image if available -->
 
 Overview
